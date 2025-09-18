@@ -3,23 +3,30 @@ layout: base.njk
 title: Fake Hemingway
 ---
 
-<div>
-    <h1>Fake Hemingway</h1>
-    <div id="left">
-        <textarea name="" id="text-area" rows="10"></textarea>
-        <button onclick="format()">Test Me</button>
-        <div id="output"></div>
+<main>
+    <h1>✍️ Fake Hemingway</h1>
+    <div class="content-wrapper">
+        <section id="left">
+            <div class="input-section">
+                <textarea name="" id="text-area" rows="10" placeholder="Paste your text here to analyze its readability..."></textarea>
+                <button onclick="format()">📊 Analyze Text</button>
+            </div>
+            <div class="output-section">
+                <div id="output"></div>
+            </div>
+        </section>
+        <aside id="right">
+            <h2>📈 Analysis</h2>
+            <div id="adverb" class="adverb counter"></div>
+            <div id="passive" class="passive counter"></div>
+            <div id="complex" class="complex counter"></div>
+            <div id="hardSentence" class="hardSentence counter"></div>
+            <div id="veryHardSentence" class="veryHardSentence counter"></div>
+        </aside>
     </div>
-    <div id="right">
-        <div id="adverb" class="adverb counter"></div>
-        <div id="passive" class="passive counter"></div>
-        <div id="complex" class="complex counter"></div>
-        <div id="hardSentence" class="hardSentence counter"></div>
-        <div id="veryHardSentence" class="veryHardSentence counter"></div>
-    </div>
-</div>
-<div id="footer">
-    <p>Fake Hemingway - A Writing Assistant</p>
-    <p>A self-hosted version of <a href="https://samwsoftware.github.io/Projects/hemingway/">Fake Hemingway</a></p>
-</div>
+</main>
+<footer id="footer">
+    <p><strong>Fake Hemingway</strong> - A Writing Assistant</p>
+    <p>A self-hosted version of <a href="https://samwsoftware.github.io/Projects/hemingway/" target="_blank" rel="noopener">Fake Hemingway</a></p>
+</footer>
 <script src="/js/index.js"></script>

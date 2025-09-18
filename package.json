@@ -14,5 +14,8 @@
   "description": "Fake Hemingway - A Writing Assistant built with Eleventy",
   "devDependencies": {
     "@11ty/eleventy": "^3.1.2"
+  },
+  "dependencies": {
+    "marked": "^16.3.0"
   }
 }
