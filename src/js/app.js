@@ -11,10 +11,48 @@ You can format your text with the toolbar.
 Paste in something you're working on and edit away. Or, click the Write button and compose something new.`;
   inputArea.value = text;
 
+  // Settings state
+  let settings = {
+    passiveDetection: 'enhanced' // Default to enhanced detection
+  };
+
   // Add real-time analysis on keyup
   inputArea.addEventListener('keyup', function() {
     format();
   });
+
+  // Add settings event listeners
+  document.addEventListener('DOMContentLoaded', function() {
+    setupSettingsHandlers();
+  });
+  
+  // If DOM is already loaded, setup immediately
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupSettingsHandlers);
+  } else {
+    setupSettingsHandlers();
+  }
+
+  function setupSettingsHandlers() {
+    // Settings radio buttons
+    const radios = document.querySelectorAll('input[name="passiveDetection"]');
+    radios.forEach(radio => {
+      radio.addEventListener('change', function() {
+        settings.passiveDetection = this.value;
+        format(); // Re-analyze with new settings
+      });
+    });
+
+    // Click outside to close settings
+    document.addEventListener('click', function(event) {
+      const settingsDropdown = document.getElementById('settings-dropdown');
+      const settingsBtn = document.getElementById('settings-btn');
+      
+      if (!settingsDropdown.contains(event.target) && !settingsBtn.contains(event.target)) {
+        settingsDropdown.classList.remove('show');
+      }
+    });
+  }
 
   let data = {
     paragraphs: 0,
@@ -45,8 +83,8 @@ Paste in something you're working on and edit away. Or, click the Write button a
     let paragraphs = text.split("\n");
     let outputArea = document.getElementById("output");
     
-    // Analyze each paragraph
-    let analyzedParagraphs = paragraphs.map(p => getDifficultSentences(p, data));
+    // Analyze each paragraph with current settings
+    let analyzedParagraphs = paragraphs.map(p => getDifficultSentences(p, data, settings));
     let formattedParagraphs = analyzedParagraphs.map(para => `<p>${para}</p>`);
     
     data.paragraphs = paragraphs.length;
@@ -83,8 +121,12 @@ Paste in something you're working on and edit away. Or, click the Write button a
     } very hard to read`;
   }
 
-  // Make format function globally available
+  // Make functions globally available
   window.format = format;
+  window.toggleSettings = function() {
+    const dropdown = document.getElementById('settings-dropdown');
+    dropdown.classList.toggle('show');
+  };
   
   // Initial format
   format();

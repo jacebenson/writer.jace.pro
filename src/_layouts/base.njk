@@ -7,6 +7,31 @@
     <title>{{ title or "Fake Hemingway" }}</title>
 </head>
 <body>
-    {{ content | safe }}
+    <header>
+        <div class="header-content">
+            <h1 class="site-title"><a href="/">Fake Hemingway</a></h1>
+            <nav>
+                <div class="dropdown">
+                    <button class="dropbtn">Thoughts</button>
+                    <div class="dropdown-content">
+                        {% set thoughts = collections.thoughts | sort(attribute='data.title') %}
+                        {% for thought in thoughts %}
+                            <a href="{{ thought.url }}">{{ thought.data.title }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <a href="/">Writing Tool</a>
+            </nav>
+        </div>
+    </header>
+    <main>
+        {{ content | safe }}
+    </main>
+    <footer id="footer">
+        <p><strong>Fake Hemingway</strong> - A Writing Assistant</p>
+        <p>A self-hosted version of <a href="https://samwsoftware.github.io/Projects/hemingway/" target="_blank" rel="noopener">Fake Hemingway</a></p>
+        <p>Inspired by <a href="https://hemingwayapp.com/" target="_blank" rel="noopener">Hemingway Editor</a></p>
+    </footer>
 </body>
 </html>

@@ -8,8 +8,30 @@ title: Fake Hemingway
     <div class="content-wrapper">
         <section id="left">
             <div class="input-section">
+                <div class="input-header">
+                    <button onclick="format()">📊 Analyze Text</button>
+                    <div class="settings-container">
+                        <button id="settings-btn" class="settings-btn" onclick="toggleSettings()">⚙️</button>
+                        <div id="settings-dropdown" class="settings-dropdown">
+                            <h3>Settings</h3>
+                            <div class="setting-item">
+                                <label>
+                                    <input type="radio" name="passiveDetection" value="enhanced" checked>
+                                    Enhanced Passive Voice Detection
+                                </label>
+                                <small>Detects irregular verbs, handles adverbs, more accurate</small>
+                            </div>
+                            <div class="setting-item">
+                                <label>
+                                    <input type="radio" name="passiveDetection" value="original">
+                                    Original Passive Voice Detection
+                                </label>
+                                <small>Basic detection for -ed endings only</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <textarea name="" id="text-area" rows="10" placeholder="Paste your text here to analyze its readability..."></textarea>
-                <button onclick="format()">📊 Analyze Text</button>
             </div>
             <div class="output-section">
                 <div id="output"></div>
@@ -25,8 +47,4 @@ title: Fake Hemingway
         </aside>
     </div>
 </main>
-<footer id="footer">
-    <p><strong>Fake Hemingway</strong> - A Writing Assistant</p>
-    <p>A self-hosted version of <a href="https://samwsoftware.github.io/Projects/hemingway/" target="_blank" rel="noopener">Fake Hemingway</a></p>
-</footer>
 <script type="module" src="/js/app.js"></script>

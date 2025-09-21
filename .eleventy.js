@@ -6,6 +6,11 @@ module.exports = function(eleventyConfig) {
   // Copy any images or other assets
   eleventyConfig.addPassthroughCopy("src/assets");
   
+  // Create thoughts collection
+  eleventyConfig.addCollection("thoughts", function(collectionApi) {
+    return collectionApi.getFilteredByGlob("src/thoughts/*.md");
+  });
+  
   return {
     dir: {
       input: "src",
