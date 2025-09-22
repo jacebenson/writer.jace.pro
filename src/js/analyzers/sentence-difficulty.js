@@ -44,7 +44,7 @@ export function getDifficultSentences(paragraph, data, settings = {}, fullText =
   // Choose passive voice analyzer based on settings
   const passiveAnalyzer = settings.passiveDetection === 'original' ? getPassiveOriginal : getPassive;
   
-  let analyzedSentences = sentences.map(sentence => {
+  let analyzedSentences = sentences.map((sentence, index) => {
     let cleanSentence = sentence.replace(/[^a-z0-9. ]/gi, "") + ".";
     let words = cleanSentence.split(" ").length;
     let letters = cleanSentence.split(" ").join("").length;
@@ -61,10 +61,13 @@ export function getDifficultSentences(paragraph, data, settings = {}, fullText =
       sentence = applyModeAnalysis(sentence, data, settings.writingMode, fullText);
     }
     
+    // Create unique ID for this sentence
+    const sentenceId = `sentence-${Date.now()}-${index}`;
+    
     // Check sentence difficulty based on readability (standard analysis)
     let level = calculateLevel(letters, words, 1);
     if (words < 14) {
-      return sentence;
+      return `<span class="clickable-sentence" data-sentence-id="${sentenceId}" data-original-sentence="${sentence.replace(/"/g, '&quot;')}">${sentence}</span>`;
     } else if (level >= 10 && level < 14) {
       data.hardSentences += 1;
       // Add specific issue for hard sentence
@@ -76,7 +79,7 @@ export function getDifficultSentences(paragraph, data, settings = {}, fullText =
           icon: '📏'
         });
       }
-      return `<span class="hardSentence">${sentence}</span>`;
+      return `<span class="hardSentence clickable-sentence" data-sentence-id="${sentenceId}" data-original-sentence="${sentence.replace(/"/g, '&quot;')}">${sentence}</span>`;
     } else if (level >= 14) {
       data.veryHardSentences += 1;
       // Add specific issue for very hard sentence
@@ -88,9 +91,9 @@ export function getDifficultSentences(paragraph, data, settings = {}, fullText =
           icon: '🔴'
         });
       }
-      return `<span class="veryHardSentence">${sentence}</span>`;
+      return `<span class="veryHardSentence clickable-sentence" data-sentence-id="${sentenceId}" data-original-sentence="${sentence.replace(/"/g, '&quot;')}">${sentence}</span>`;
     } else {
-      return sentence;
+      return `<span class="clickable-sentence" data-sentence-id="${sentenceId}" data-original-sentence="${sentence.replace(/"/g, '&quot;')}">${sentence}</span>`;
     }
   });
 

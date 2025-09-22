@@ -17,6 +17,10 @@ title: Fake Hemingway
                 <div class="bg-slate-100 border-b border-slate-200 px-6 py-4 flex items-center justify-between flex-shrink-0">
                     <h2 class="text-base font-semibold text-slate-900 m-0">Write</h2>
                     <div class="flex items-center gap-3">
+                        <button id="mic-btn" class="flex items-center gap-2 bg-transparent border border-slate-300 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 cursor-pointer transition-all hover:bg-white hover:border-blue-500 hover:text-blue-600" onclick="toggleSpeechToText()" title="Voice Input (Ctrl+Shift+V)">
+                            <span class="text-base" id="mic-icon">🎤</span>
+                            <span id="mic-text">Voice</span>
+                        </button>
                         <button class="flex items-center gap-2 bg-transparent border border-slate-300 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 cursor-pointer transition-all hover:bg-white hover:border-red-500 hover:text-red-600" onclick="clearText()" title="Clear Text">
                             <span class="text-base">🗑️</span>
                         </button>
@@ -92,5 +96,29 @@ title: Fake Hemingway
         </section>
     </div>
 </div>
+
+<!-- Sentence Issues Popup -->
+<div id="sentence-popup" class="sentence-popup">
+    <div class="sentence-popup-header">
+        <h3 class="sentence-popup-title">Sentence Issues</h3>
+        <button class="sentence-popup-close" onclick="closeSentencePopup()">&times;</button>
+    </div>
+    <div class="sentence-popup-content" id="sentence-popup-content">
+        <!-- Content will be populated by JavaScript -->
+    </div>
+</div>
+
+<!-- Sentence Issues Dialog -->
+<dialog id="sentence-dialog" class="sentence-dialog">
+    <div class="p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-900">Sentence Analysis</h3>
+            <button class="text-gray-400 hover:text-gray-600 text-xl" onclick="closeSentenceDialog()" type="button">&times;</button>
+        </div>
+        <div id="sentence-dialog-content" class="max-h-80 overflow-y-auto">
+            <!-- Content will be populated by JavaScript -->
+        </div>
+    </div>
+</dialog>
 
 <script type="module" src="/js/app.js"></script>

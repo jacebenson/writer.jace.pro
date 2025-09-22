@@ -11,20 +11,60 @@ import {
   analyzeSocialProof
 } from './mode-utils.js';
 
-// Weak CTA phrases that should be more benefit-focused
-const WEAK_CTAS = [
-  "get started", "sign up", "learn more", "click here", "submit", 
-  "register", "continue", "proceed", "next", "go", "enter",
-  "join now", "try now", "see more", "find out", "discover"
-];
+// Weak CTA phrases categorized by weakness type
+const WEAK_CTAS = {
+  // Very weak - vague and passive
+  veryWeak: [
+    "click here", "submit", "continue", "proceed", "next", "go", "enter",
+    "see more", "find out", "read more", "view more", "more info"
+  ],
+  
+  // Weak - generic but has some action
+  weak: [
+    "get started", "sign up", "learn more", "register", "join now", 
+    "try now", "discover", "explore", "check out", "take a look"
+  ],
+  
+  // Missing benefit - action word but no clear value
+  missingBenefit: [
+    "download", "subscribe", "follow", "contact us", "get access",
+    "join", "start", "begin", "try", "test", "use"
+  ],
+  
+  // Passive language - weak verbs
+  passive: [
+    "we'll help", "let us", "allow us", "we can", "we will",
+    "it helps", "this enables", "you can", "feel free to"
+  ]
+};
 
-// Strong CTA examples (for suggestions)
-const STRONG_CTA_EXAMPLES = [
-  "Get your free analysis", "Start saving money now", "Boost your sales today",
-  "Download your guide", "Claim your discount", "Access your dashboard",
-  "Get instant results", "Unlock your potential", "Transform your business",
-  "See immediate improvements", "Start your free trial", "Get results now"
-];
+// Context-aware strong CTA templates by category
+const STRONG_CTA_TEMPLATES = {
+  lead_generation: [
+    "Get your free {benefit}", "Download your {benefit}", "Claim your {benefit}",
+    "Access your {benefit}", "Start your {benefit}", "Unlock your {benefit}"
+  ],
+  
+  trial_signup: [
+    "Start your free trial", "Try {product} free", "Get {timeframe} free",
+    "Start saving {benefit} today", "Begin your {benefit} journey"
+  ],
+  
+  purchase: [
+    "Get {product} now", "Buy {product} today", "Order your {product}",
+    "Claim your {discount}", "Save {amount} today", "Get {percentage} off"
+  ],
+  
+  content: [
+    "Download the guide", "Get the checklist", "Access the template",
+    "Read the report", "View the case study", "Get the blueprint"
+  ],
+  
+  consultation: [
+    "Book your free consultation", "Schedule your audit", "Get your assessment",
+    "Claim your strategy session", "Reserve your spot"
+  ]
+};
 
 // Power words for headlines and marketing copy
 const POWER_WORDS = [
@@ -91,11 +131,21 @@ export function getMarketingAnalysis(sentence, data, fullText = '') {
   }
   
   // Check for weak CTAs
-  const ctaCheck = checkForWeakCTA(sentence);
+  const ctaCheck = checkForWeakCTA(sentence, fullText);
   if (ctaCheck.isWeak) {
     data.marketing.weakCTAs += 1;
-    result = createHighlight(result, 'marketing-weak-cta',
-      ctaCheck.suggestion, 'Use Verb + Benefit formula for stronger CTAs');
+    
+    // Create more detailed highlight based on strength and category
+    const strengthClass = ctaCheck.strength <= 3 ? 'marketing-very-weak-cta' : 'marketing-weak-cta';
+    const detailedSuggestion = `${ctaCheck.suggestion} | Strength: ${ctaCheck.strength}/10`;
+    const reason = ctaCheck.issues ? `Issues: ${ctaCheck.issues.join(', ')}` : 'Use Verb + Benefit formula for stronger CTAs';
+    
+    result = createHighlight(result, strengthClass, detailedSuggestion, reason);
+    
+    // Add positioning feedback if available
+    if (ctaCheck.positioning) {
+      data.marketing.ctaPositioning = ctaCheck.positioning;
+    }
   }
   
   // Highlight feature-focused language
@@ -154,25 +204,262 @@ function analyzeHeadline(headline) {
 }
 
 /**
- * Check if sentence contains a weak CTA
+ * Check if sentence contains a weak CTA with enhanced detection
  * @param {string} sentence - Sentence to check
- * @returns {Object} CTA analysis result
+ * @param {string} fullText - Complete text for context
+ * @returns {Object} Enhanced CTA analysis result
  */
-function checkForWeakCTA(sentence) {
-  const lowerSentence = sentence.toLowerCase();
+function checkForWeakCTA(sentence, fullText = '') {
+  const lowerSentence = sentence.toLowerCase().trim();
   
-  for (const weakCta of WEAK_CTAS) {
-    if (lowerSentence.includes(weakCta)) {
-      const randomExample = STRONG_CTA_EXAMPLES[Math.floor(Math.random() * STRONG_CTA_EXAMPLES.length)];
+  // Check for different types of weak CTAs
+  for (const [category, phrases] of Object.entries(WEAK_CTAS)) {
+    for (const phrase of phrases) {
+      if (lowerSentence.includes(phrase)) {
+        const ctaAnalysis = analyzeCTAStrength(sentence, fullText);
+        return {
+          isWeak: true,
+          weakCta: phrase,
+          category: category,
+          strength: ctaAnalysis.strength,
+          issues: ctaAnalysis.issues,
+          suggestion: generateContextualCTASuggestion(sentence, category, fullText),
+          positioning: analyzeCTAPositioning(sentence, fullText)
+        };
+      }
+    }
+  }
+  
+  // Check for other weak patterns
+  const weakPatterns = [
+    { pattern: /^(we|our|this|it) (will|can|helps?|enables?)/i, issue: "starts with company focus instead of customer benefit" },
+    { pattern: /\b(maybe|perhaps|consider|might want to)\b/i, issue: "uses tentative language instead of confident direction" },
+    { pattern: /\b(feel free to|if you want|you can)\b/i, issue: "lacks urgency and commitment" },
+    { pattern: /\?\s*$/, issue: "ends with question instead of clear direction" }
+  ];
+  
+  for (const { pattern, issue } of weakPatterns) {
+    if (pattern.test(sentence)) {
       return {
         isWeak: true,
-        weakCta: weakCta,
-        suggestion: `Try "${randomExample}" instead of "${weakCta}"`
+        weakCta: sentence.match(pattern)[0],
+        category: 'pattern',
+        issue: issue,
+        suggestion: `Make it more direct and benefit-focused`,
+        strength: 2 // out of 10
       };
     }
   }
   
   return { isWeak: false };
+}
+
+/**
+ * Analyze the overall strength of a CTA
+ * @param {string} cta - The CTA text
+ * @param {string} context - Surrounding text context
+ * @returns {Object} Strength analysis
+ */
+function analyzeCTAStrength(cta, context) {
+  let score = 5; // Start at neutral
+  const issues = [];
+  const strengths = [];
+  
+  const lowerCTA = cta.toLowerCase();
+  
+  // Check for action verbs (positive)
+  const actionVerbs = ['get', 'start', 'download', 'claim', 'access', 'unlock', 'boost', 'save', 'earn', 'win'];
+  if (actionVerbs.some(verb => lowerCTA.includes(verb))) {
+    score += 2;
+    strengths.push("has action verb");
+  } else {
+    score -= 2;
+    issues.push("missing strong action verb");
+  }
+  
+  // Check for benefit indicators (positive)
+  const benefitWords = ['free', 'save', 'boost', 'increase', 'improve', 'results', 'instant', 'immediate'];
+  if (benefitWords.some(word => lowerCTA.includes(word))) {
+    score += 2;
+    strengths.push("includes clear benefit");
+  } else {
+    score -= 1;
+    issues.push("missing clear benefit");
+  }
+  
+  // Check for urgency (positive)
+  const urgencyWords = ['now', 'today', 'instant', 'immediate', 'limited', 'hurry'];
+  if (urgencyWords.some(word => lowerCTA.includes(word))) {
+    score += 1;
+    strengths.push("creates urgency");
+  }
+  
+  // Check for weak words (negative)
+  const weakWords = ['maybe', 'perhaps', 'try', 'consider', 'might'];
+  if (weakWords.some(word => lowerCTA.includes(word))) {
+    score -= 2;
+    issues.push("uses weak/tentative language");
+  }
+  
+  // Check for specificity (positive)
+  if (/\b(free|[\d%]+\s*(off|discount)|[\d]+\s*(minutes?|hours?|days?))\b/i.test(lowerCTA)) {
+    score += 1;
+    strengths.push("includes specific offer/timeframe");
+  }
+  
+  // Check length (optimal is 2-5 words)
+  const wordCount = cta.trim().split(/\s+/).length;
+  if (wordCount >= 2 && wordCount <= 5) {
+    score += 1;
+    strengths.push("appropriate length");
+  } else if (wordCount > 7) {
+    score -= 1;
+    issues.push("too long");
+  } else if (wordCount < 2) {
+    score -= 1;
+    issues.push("too short");
+  }
+  
+  return {
+    strength: Math.max(1, Math.min(10, score)),
+    issues: issues,
+    strengths: strengths
+  };
+}
+
+/**
+ * Generate contextual CTA suggestions based on weakness category
+ * @param {string} originalCTA - Original CTA text
+ * @param {string} category - Weakness category
+ * @param {string} fullText - Complete text for context
+ * @returns {string} Contextual suggestion
+ */
+function generateContextualCTASuggestion(originalCTA, category, fullText) {
+  const context = detectContentContext(fullText);
+  const templates = STRONG_CTA_TEMPLATES[context] || STRONG_CTA_TEMPLATES.lead_generation;
+  
+  switch (category) {
+    case 'veryWeak':
+      return `Replace with benefit-focused action: "${templates[0].replace('{benefit}', 'free guide')}"`;
+    
+    case 'weak':
+      return `Add specific benefit: "${templates[1].replace('{product}', 'our tool').replace('{timeframe}', '30 days')}"`;
+    
+    case 'missingBenefit':
+      const benefit = extractPossibleBenefit(fullText) || 'instant access';
+      return `Add clear value: "${templates[0].replace('{benefit}', benefit)}"`;
+    
+    case 'passive':
+      return `Make it direct and customer-focused: "${templates[0].replace('{benefit}', 'results')}"`;
+    
+    default:
+      return `Strengthen with: Verb + Specific Benefit + Urgency (e.g., "${templates[0]}")`;
+  }
+}
+
+/**
+ * Detect the context/purpose of the content to suggest appropriate CTAs
+ * @param {string} text - Full text content
+ * @returns {string} Context category
+ */
+function detectContentContext(text) {
+  const lowerText = text.toLowerCase();
+  
+  if (/\b(trial|demo|test|try)\b/.test(lowerText)) return 'trial_signup';
+  if (/\b(buy|purchase|price|cost|\$|order)\b/.test(lowerText)) return 'purchase';
+  if (/\b(guide|ebook|checklist|template|report)\b/.test(lowerText)) return 'content';
+  if (/\b(consultation|call|meeting|audit|assessment)\b/.test(lowerText)) return 'consultation';
+  
+  return 'lead_generation';
+}
+
+/**
+ * Extract possible benefits from the surrounding text
+ * @param {string} text - Text to analyze for benefits
+ * @returns {string|null} Detected benefit or null
+ */
+function extractPossibleBenefit(text) {
+  const benefitPatterns = [
+    /\b(save|saving)\s+(\w+)/i,
+    /\b(increase|boost|improve|grow)\s+(\w+)/i,
+    /\b(free|instant|immediate)\s+(\w+)/i,
+    /\b(\d+%)\s+(more|less|faster)/i
+  ];
+  
+  for (const pattern of benefitPatterns) {
+    const match = text.match(pattern);
+    if (match) {
+      return match[0].toLowerCase();
+    }
+  }
+  
+  return null;
+}
+
+/**
+ * Analyze CTA positioning within the content
+ * @param {string} cta - The CTA sentence
+ * @param {string} fullText - Complete text
+ * @returns {Object} Positioning analysis
+ */
+function analyzeCTAPositioning(cta, fullText) {
+  const sentences = fullText.split(/[.!?]+/).filter(s => s.trim().length > 0);
+  const ctaIndex = sentences.findIndex(s => s.includes(cta.replace(/<[^>]*>/g, '')));
+  
+  if (ctaIndex === -1) return { position: 'unknown', score: 5 };
+  
+  const totalSentences = sentences.length;
+  const positionRatio = ctaIndex / totalSentences;
+  
+  let position, score;
+  
+  if (positionRatio < 0.1) {
+    position = 'very_early';
+    score = 6; // Can work for headlines but may be premature
+  } else if (positionRatio < 0.3) {
+    position = 'early';
+    score = 8; // Good positioning after some value
+  } else if (positionRatio < 0.7) {
+    position = 'middle';
+    score = 7; // Decent but not optimal
+  } else if (positionRatio < 0.9) {
+    position = 'late';
+    score = 9; // Good positioning after value delivery
+  } else {
+    position = 'very_late';
+    score = 10; // Excellent positioning at the end
+  }
+  
+  return {
+    position: position,
+    score: score,
+    index: ctaIndex,
+    total: totalSentences,
+    recommendation: getPositioningRecommendation(position, score)
+  };
+}
+
+/**
+ * Get positioning recommendations
+ * @param {string} position - Position category
+ * @param {number} score - Position score
+ * @returns {string} Recommendation
+ */
+function getPositioningRecommendation(position, score) {
+  switch (position) {
+    case 'very_early':
+      return 'Consider providing more value before the CTA';
+    case 'early':
+      return 'Good early positioning - ensure you\'ve established value';
+    case 'middle':
+      return 'Consider moving closer to the end after delivering value';
+    case 'late':
+      return 'Excellent positioning after value delivery';
+    case 'very_late':
+      return 'Perfect positioning - readers are convinced and ready to act';
+    default:
+      return 'Position after establishing clear value and benefits';
+  }
 }
 
 /**
@@ -282,9 +569,10 @@ export function analyzeMarketingEffectiveness(text) {
   
   // Analyze CTAs
   const ctas = extractCTAs(text);
-  const weakCTAs = ctas.filter(cta => 
-    WEAK_CTAS.some(weak => cta.toLowerCase().includes(weak))
-  );
+  const weakCTAs = ctas.filter(cta => {
+    const lowerCTA = cta.toLowerCase();
+    return Object.values(WEAK_CTAS).flat().some(weak => lowerCTA.includes(weak));
+  });
   
   // Analyze social proof
   const socialProof = analyzeSocialProof(text);
@@ -405,7 +693,7 @@ function generateMarketingRecommendations(score, metrics) {
 // Export constants for use in other modules
 export { 
   WEAK_CTAS, 
-  STRONG_CTA_EXAMPLES, 
+  STRONG_CTA_TEMPLATES, 
   POWER_WORDS, 
   FEATURE_WORDS, 
   BENEFIT_WORDS,
