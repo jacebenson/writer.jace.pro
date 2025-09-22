@@ -3,48 +3,94 @@ layout: base.njk
 title: Fake Hemingway
 ---
 
-<main>
-    <h1>✍️ Fake Hemingway</h1>
-    <div class="content-wrapper">
-        <section id="left">
-            <div class="input-section">
-                <div class="input-header">
-                    <button onclick="format()">📊 Analyze Text</button>
-                    <div class="settings-container">
-                        <button id="settings-btn" class="settings-btn" onclick="toggleSettings()">⚙️</button>
-                        <div id="settings-dropdown" class="settings-dropdown">
-                            <h3>Settings</h3>
-                            <div class="setting-item">
-                                <label>
-                                    <input type="radio" name="passiveDetection" value="enhanced" checked>
-                                    Enhanced Passive Voice Detection
-                                </label>
-                                <small>Detects irregular verbs, handles adverbs, more accurate</small>
-                            </div>
-                            <div class="setting-item">
-                                <label>
-                                    <input type="radio" name="passiveDetection" value="original">
-                                    Original Passive Voice Detection
-                                </label>
-                                <small>Basic detection for -ed endings only</small>
+<div class="min-h-screen flex flex-col">
+    <!-- Legend -->
+    <div class="bg-white border-b border-slate-200 px-6 py-4" id="legend">
+        <!-- Legend content will be populated by JavaScript -->
+    </div>
+    
+    <!-- Main Content Area -->
+    <div class="flex-1 grid grid-cols-2 gap-px bg-slate-200 min-h-[calc(100vh-70px)]" id="main-content">
+        <!-- Editor Panel -->
+        <section class="bg-white flex flex-col overflow-hidden" id="editor-panel">
+            <div class="h-full flex flex-col">
+                <div class="bg-slate-100 border-b border-slate-200 px-6 py-4 flex items-center justify-between flex-shrink-0">
+                    <h2 class="text-base font-semibold text-slate-900 m-0">Write</h2>
+                    <div class="flex items-center gap-3">
+                        <button class="flex items-center gap-2 bg-transparent border border-slate-300 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 cursor-pointer transition-all hover:bg-white hover:border-red-500 hover:text-red-600" onclick="clearText()" title="Clear Text">
+                            <span class="text-base">🗑️</span>
+                        </button>
+                        <button class="flex items-center gap-2 bg-blue-600 border border-blue-600 rounded-lg px-3 py-2 text-sm font-medium text-white cursor-pointer transition-all hover:bg-blue-700" onclick="analyzeText()" title="Analyze (Ctrl+Enter)">
+                            <span class="text-base">📊</span>
+                            Analyze
+                        </button>
+                    </div>
+                </div>
+                <div class="flex-1 flex flex-col">
+                    <textarea 
+                        id="text-area" 
+                        class="flex-1 w-full p-6 border-none resize-none outline-none font-sans text-base leading-relaxed text-slate-900 placeholder:text-slate-400"
+                        placeholder="Start writing here... Your text will be analyzed for clarity, readability, and style as you type."
+                        spellcheck="true"
+                        autocomplete="off"
+                    ></textarea>
+                    <div class="bg-slate-50 border-t border-slate-200 px-6 py-3 flex items-center gap-6 text-sm text-slate-600">
+                        <span id="word-count">0 words</span>
+                        <span id="char-count">0 characters</span>
+                        <span id="sentence-count">0 sentences</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Preview Panel -->
+        <section class="bg-white flex flex-col overflow-hidden" id="preview-panel">
+            <div class="h-full flex flex-col">
+                <div class="bg-slate-100 border-b border-slate-200 px-6 py-4 flex items-center justify-between flex-shrink-0">
+                    <h2 class="text-base font-semibold text-slate-900 m-0">Analysis</h2>
+                    <div class="flex items-center gap-4" id="analysis-summary">
+                        <span class="flex items-center gap-2 text-sm" id="readability-score">
+                            <span class="text-slate-600">Readability</span>
+                            <span class="font-semibold text-slate-900">-</span>
+                        </span>
+                    </div>
+                </div>
+                
+                <!-- Analysis Content -->
+                <div class="flex-1 overflow-y-auto p-6">
+                    <!-- Highlighted Text Output -->
+                    <div class="mb-8">
+                        <h3 class="text-lg font-semibold text-slate-900 mb-4">Your Text with Highlights</h3>
+                        <div id="output" class="prose max-w-none text-slate-900 leading-relaxed">
+                            <p class="text-slate-500 italic">
+                                Your analyzed text will appear here with color-coded highlights for different writing issues.
+                            </p>
+                        </div>
+                        
+                        <!-- Writing Tips - moved here to be with the text -->
+                        <div class="mt-6 pt-5 border-t border-slate-200">
+                            <h4 class="text-base font-semibold text-slate-900 mb-3">
+                                ✍️ Writing Suggestions
+                            </h4>
+                            <div id="writing-tips" class="space-y-2">
+                                <div class="text-sm text-slate-600">
+                                    Choose a writing mode above to get specific feedback for your writing goals.
+                                </div>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Analysis Metrics -->
+                    <div>
+                        <h3 class="text-base font-semibold text-slate-900 mb-2">Writing Metrics</h3>
+                        <div id="analysis-metrics" class="grid grid-cols-3 gap-3 text-sm">
+                            <!-- Metrics will be populated by JavaScript -->
+                        </div>
+                    </div>
                 </div>
-                <textarea name="" id="text-area" rows="10" placeholder="Paste your text here to analyze its readability..."></textarea>
-            </div>
-            <div class="output-section">
-                <div id="output"></div>
             </div>
         </section>
-        <aside id="right">
-            <h2>📈 Analysis</h2>
-            <div id="adverb" class="adverb counter"></div>
-            <div id="passive" class="passive counter"></div>
-            <div id="complex" class="complex counter"></div>
-            <div id="hardSentence" class="hardSentence counter"></div>
-            <div id="veryHardSentence" class="veryHardSentence counter"></div>
-        </aside>
     </div>
-</main>
+</div>
+
 <script type="module" src="/js/app.js"></script>
