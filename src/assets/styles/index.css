@@ -149,3 +149,17 @@ body {
 #settings-dropdown.show {
   @apply opacity-100 visible translate-y-0;
 }
+
+/* Sentence Issues Dialog - Simple styling */
+.sentence-dialog {
+  @apply max-w-md w-full mx-auto my-auto bg-white rounded-lg shadow-xl border border-gray-200;
+}
+
+.sentence-dialog::backdrop {
+  @apply bg-black/50;
+}
+
+/* Clickable sentence styling */
+.clickable-sentence {
+  @apply cursor-pointer hover:bg-blue-50 px-1 rounded transition-colors;
+}
