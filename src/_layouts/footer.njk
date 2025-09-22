@@ -1,0 +1,35 @@
+<footer class="bg-slate-900 text-slate-300 p-8 mt-12">
+    <div class="max-w-6xl mx-auto">
+        <div class="grid md:grid-cols-3 gap-8 mb-8">
+            <!-- About Section -->
+            <div class="text-center md:text-left">
+                <h3 class="text-white font-semibold mb-3">Fake Hemingway</h3>
+                <p class="mb-2">A Writing Assistant</p>
+                <p class="mb-2">A self-hosted version of <a href="https://samwsoftware.github.io/Projects/hemingway/" target="_blank" rel="noopener" class="text-blue-400 hover:text-blue-300">Fake Hemingway</a></p>
+                <p>Inspired by <a href="https://hemingwayapp.com/" target="_blank" rel="noopener" class="text-blue-400 hover:text-blue-300">Hemingway Editor</a></p>
+            </div>
+            
+            <!-- Thoughts Section -->
+            <div class="text-center md:text-left">
+                <h3 class="text-white font-semibold mb-3">Writing Thoughts</h3>
+                <nav class="space-y-2">
+                    {% set thoughts = collections.thoughts | sort(attribute='data.title') %}
+                    {% for thought in thoughts %}
+                        <a href="{{ thought.data.source }}" class="block text-slate-300 hover:text-blue-300 transition-colors" target="_blank" rel="noopener noreferrer">{{ thought.data.title }}</a>
+                    {% endfor %}
+                </nav>
+            </div>
+            
+            <!-- Documentation Section -->
+            <div class="text-center md:text-left">
+                <h3 class="text-white font-semibold mb-3">Documentation</h3>
+                <nav class="space-y-2">
+                    {% set docs = collections.docs | sort(attribute='data.title') %}
+                    {% for doc in docs %}
+                        <a href="{{ doc.url }}" class="block text-slate-300 hover:text-blue-300 transition-colors">{{ doc.data.title }}</a>
+                    {% endfor %}
+                </nav>
+            </div>
+        </div>
+    </div>
+</footer>

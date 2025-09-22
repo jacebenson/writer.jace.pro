@@ -1,0 +1,136 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import modern font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* Custom component styles that can't be easily replaced with Tailwind utilities */
+@layer components {
+  
+  /* Text analysis highlights */
+  .adverb {
+    @apply bg-blue-100 text-blue-800 px-1 rounded border-b-2 border-blue-400;
+  }
+  
+  .passive {
+    @apply bg-green-100 text-green-800 px-1 rounded border-b-2 border-green-400;
+  }
+  
+  .complex {
+    @apply bg-purple-100 text-purple-800 px-1 rounded border-b-2 border-purple-400;
+  }
+  
+  .hardSentence {
+    @apply bg-yellow-100 text-yellow-800 px-1 rounded border-b-2 border-yellow-400;
+  }
+  
+  .veryHardSentence {
+    @apply bg-red-100 text-red-800 px-1 rounded border-b-2 border-red-400;
+  }
+  
+  .qualifier {
+    @apply bg-blue-100 text-blue-800 px-1 rounded border-b-2 border-blue-400;
+  }
+
+  /* Mode-specific highlights */
+  .brevity-wordy {
+    @apply bg-orange-100 text-orange-800 px-1 rounded border-b-2 border-orange-400;
+  }
+
+  .brevity-redundant {
+    @apply bg-orange-200 text-orange-900 px-1 rounded border-b-2 border-orange-500;
+  }
+
+  .brevity-filler {
+    @apply bg-yellow-100 text-yellow-800 px-1 rounded border-b-2 border-yellow-400;
+  }
+
+  .brevity-qualifier {
+    @apply bg-orange-100 text-orange-800 px-1 rounded border-b-2 border-orange-400;
+  }
+
+  .brevity-long-sentence {
+    @apply bg-orange-100 text-orange-800 px-1 rounded border-b-2 border-orange-400;
+  }
+
+  .conversational-missing-contraction {
+    @apply bg-cyan-100 text-cyan-800 px-1 rounded border-b-2 border-cyan-400;
+  }
+
+  .conversational-formal {
+    @apply bg-cyan-100 text-cyan-800 px-1 rounded border-b-2 border-cyan-400;
+  }
+
+  .conversational-impersonal {
+    @apply bg-cyan-200 text-cyan-900 px-1 rounded border-b-2 border-cyan-500;
+  }
+
+  .conversational-complex {
+    @apply bg-cyan-100 text-cyan-800 px-1 rounded border-b-2 border-cyan-400;
+  }
+
+  .conversational-transition {
+    @apply bg-cyan-100 text-cyan-800 px-1 rounded border-b-2 border-cyan-400;
+  }
+
+  .conversational-complex-sentence {
+    @apply bg-cyan-100 text-cyan-800 px-1 rounded border-b-2 border-cyan-400;
+  }
+
+  .marketing-weak-headline {
+    @apply bg-pink-100 text-pink-800 px-1 rounded border-b-2 border-pink-400;
+  }
+
+  .marketing-weak-cta {
+    @apply bg-pink-200 text-pink-900 px-1 rounded border-b-2 border-pink-500;
+  }
+
+  .marketing-feature-focused {
+    @apply bg-purple-100 text-purple-800 px-1 rounded border-b-2 border-purple-400;
+  }
+
+  .marketing-vague-claim {
+    @apply bg-red-100 text-red-800 px-1 rounded border-b-2 border-red-400;
+  }
+
+  .marketing-missing-urgency {
+    @apply bg-blue-100 text-blue-800 px-1 rounded border-b-2 border-blue-400;
+  }
+
+  /* Dropdown animation */
+  .dropdown-content {
+    @apply hidden absolute top-full left-0 bg-white/95 min-w-[200px] rounded-xl shadow-lg backdrop-blur border border-white/20 z-50 mt-1 overflow-hidden;
+  }
+
+  .dropdown:hover .dropdown-content,
+  .dropdown-content:hover {
+    @apply block;
+    animation: fadeInDown 0.3s ease;
+  }
+
+  @keyframes fadeInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Legend colors */
+  .adverb-color { @apply bg-blue-400; }
+  .passive-color { @apply bg-green-400; }
+  .complex-color { @apply bg-purple-400; }
+  .hard-sentence-color { @apply bg-yellow-400; }
+  .very-hard-sentence-color { @apply bg-red-400; }
+}
+
+/* Base styling */
+@layer base {
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+}
